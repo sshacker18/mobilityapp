@@ -1,0 +1,59 @@
+name: Playwright E2E
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  playwright-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend deps
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Install backend deps
+        run: |
+          cd backend
+          npm ci
+
+      - name: Install Playwright browsers
+        run: |
+          cd frontend
+          npx playwright install --with-deps
+
+      - name: Start backend
+        run: |
+          cd backend
+          nohup npm run dev > ../backend.log 2>&1 &
+
+      - name: Start frontend
+        run: |
+          cd frontend
+          nohup npm run dev > ../frontend.log 2>&1 &
+
+      - name: Wait for services
+        run: |
+          npx wait-on http://localhost:4000/api/health http://localhost:5173 || (sleep 5 && npx wait-on http://localhost:4000/api/health http://localhost:5173)
+
+      - name: Run Playwright tests
+        run: |
+          cd frontend
+          npx playwright test --reporter=list
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: frontend/tests-playwright-artifacts || frontend/tests/artifacts || frontend/test-results || playwright-report

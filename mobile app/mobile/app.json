@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Mobility",
+    "slug": "mobility-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.mobility.app"
+    }
+  }
+}

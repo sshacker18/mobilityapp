@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mobility
+      POSTGRES_PASSWORD: mobility_pass
+      POSTGRES_DB: mobility_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - db
+    environment:
+      # Use container network name 'db' to connect
+      DATABASE_URL: "postgresql://mobility:mobility_pass@db:5432/mobility_db"
+      PORT: 4000
+    ports:
+      - '4000:4000'
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - '5173:80'
+    volumes:
+      - ./frontend:/app
+    environment:
+      VITE_API_URL: http://localhost:4000
+
+volumes:
+  db_data:
+
+# Notes:
+# - After `docker-compose up -d`, run backend migrations before using the app:
+#     docker-compose exec backend npx prisma migrate deploy
+#   or run the appropriate npm script in the backend container.
+# - Adjust ports and environment variables (DATABASE_URL, JWT_SECRET) as needed.

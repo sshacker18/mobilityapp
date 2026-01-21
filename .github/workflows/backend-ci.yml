@@ -1,0 +1,68 @@
+name: Backend CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('backend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install backend deps
+        run: |
+          cd backend
+          npm ci
+
+      - name: Run lint and tests
+        run: |
+          cd backend
+          # If you have lint/test scripts, run them here. Change as needed.
+          npm run lint --if-present || true
+          npm test --if-present || true
+
+      - name: Build backend
+        run: |
+          cd backend
+          npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist
+          path: backend/dist
+
+      - name: Deploy (Railway example)
+        if: secrets.RAILWAY_TOKEN != ''
+        run: |
+          echo "Railway deploy example (requires RAILWAY_TOKEN secret)."
+          echo "Install railway CLI and run 'railway up' as needed."
+          # npm i -g railway
+          # railway login --apiKey $RAILWAY_TOKEN
+          # railway up --service <service>
+
+      - name: Deploy (Docker Hub example)
+        if: secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != ''
+        run: |
+          echo "Docker Hub deploy example. Build and push image with secrets DOCKERHUB_USERNAME and DOCKERHUB_TOKEN."
+          # docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_TOKEN
+          # docker build -t $DOCKERHUB_USERNAME/mobility-backend:latest backend
+          # docker push $DOCKERHUB_USERNAME/mobility-backend:latest
+
+      - name: Deployment note
+        run: |
+          echo "No deployment performed because deploy secrets were not provided or actions are commented."

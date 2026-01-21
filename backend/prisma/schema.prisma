@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  DRIVER
+  COMPANY
+  ADMIN
+}
+
+enum BookingStatus {
+  CREATED
+  ONGOING
+  COMPLETED
+}
+
+enum RideMode {
+  CAB
+  AUTO
+  SCOOTY
+  EV
+  PRIVATE_JET
+}
+
+enum LedgerType {
+  CREDIT
+  DEBIT
+}
+
+enum PaymentStatus {
+  PAY_LATER
+  TEST_SUCCESS
+}
+
+model User {
+  id        String    @id @default(cuid())
+  phone     String    @unique
+  name      String?
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  wallet    Wallet?
+  bookings  Booking[] @relation("UserBookings")
+  driver    Driver?   @relation("UserDriver")
+}
+
+model Company {
+  id        String    @id @default(cuid())
+  name      String
+  email     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  wallet    Wallet?
+  bookings  Booking[] @relation("CompanyBookings")
+}
+
+model Driver {
+  id          String    @id @default(cuid())
+  user        User      @relation("UserDriver", fields: [userId], references: [id])
+  userId      String    @unique
+  isAvailable Boolean   @default(false)
+  currentLat  Float?
+  currentLng  Float?
+  lastSeenAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  bookings    Booking[] @relation("DriverBookings")
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  user          User          @relation("UserBookings", fields: [userId], references: [id])
+  userId        String
+  driver        Driver?       @relation("DriverBookings", fields: [driverId], references: [id])
+  driverId      String?
+  company       Company?      @relation("CompanyBookings", fields: [companyId], references: [id])
+  companyId     String?
+  mode          RideMode
+  pickupLat     Float?
+  pickupLng     Float?
+  dropLat       Float?
+  dropLng       Float?
+  status        BookingStatus @default(CREATED)
+  lockedAt      DateTime?
+  fare          Float?        @default(0)
+  paymentStatus PaymentStatus @default(PAY_LATER)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  ledgerEntries LedgerEntry[]
+}
+
+model Wallet {
+  id        String        @id @default(cuid())
+  user      User?         @relation(fields: [userId], references: [id])
+  userId    String?       @unique
+  company   Company?      @relation(fields: [companyId], references: [id])
+  companyId String?       @unique
+  balance   Float         @default(0)
+  entries   LedgerEntry[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+model LedgerEntry {
+  id        String     @id @default(cuid())
+  wallet    Wallet     @relation(fields: [walletId], references: [id])
+  walletId  String
+  amount    Float
+  type      LedgerType
+  booking   Booking?   @relation(fields: [bookingId], references: [id])
+  bookingId String?
+  note      String?
+  createdAt DateTime   @default(now())
+}
+
+model Otp {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  used      Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

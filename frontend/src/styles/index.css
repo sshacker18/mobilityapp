@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'leaflet/dist/leaflet.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* App-wide styles and small components */
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  @apply bg-white text-gray-900;
+}
+
+.container-mobile {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.tap-target { @apply p-md rounded-lg text-center } /* convenience */
+
+.auth-shell {
+  @apply min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-800 text-white;
+}
+
+.auth-card {
+  @apply rounded-3xl border border-white/10 bg-white/10 p-6 shadow-2xl backdrop-blur;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    @apply rounded-2xl p-4;
+  }
+
+  .vehicle-card {
+    @apply rounded-2xl p-3;
+  }
+
+  .wizard-card-dark,
+  .wizard-card {
+    @apply rounded-2xl p-4;
+  }
+}
+
+.auth-input {
+  @apply w-full rounded-2xl border border-white/10 bg-white/15 px-4 py-3 text-base text-white placeholder:text-slate-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/50;
+}
+
+.primary-button {
+  @apply w-full rounded-2xl bg-brand px-5 py-3 text-base font-semibold text-white shadow-soft transition-transform duration-150 hover:bg-brand-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+}
+
+.vehicle-card {
+  @apply relative flex flex-col gap-3 rounded-3xl border border-white/10 bg-white/10 p-4 text-left shadow-xl transition-transform duration-150 hover:-translate-y-1 hover:border-brand/50;
+}
+
+.vehicle-icon {
+  @apply flex h-12 w-12 items-center justify-center rounded-2xl bg-white/20 text-2xl;
+}
+
+@layer components {
+  .wizard-card {
+    @apply rounded-3xl border border-white/60 bg-white/70 shadow-xl backdrop-blur;
+  }
+
+  .wizard-card-dark {
+    @apply rounded-3xl border border-white/10 bg-white/10 shadow-2xl backdrop-blur;
+  }
+
+  .wizard-input {
+    @apply w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-soft focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30;
+  }
+
+  .wizard-input-dark {
+    @apply w-full rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-base text-white placeholder:text-slate-300 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/50;
+  }
+
+  .wizard-label {
+    @apply text-xs font-semibold uppercase tracking-wide text-slate-500;
+  }
+
+  .wizard-label-dark {
+    @apply text-xs font-semibold uppercase tracking-wide text-slate-300;
+  }
+
+  .wizard-button {
+    @apply w-full rounded-2xl bg-brand px-5 py-3 text-base font-semibold text-white shadow-soft transition-transform duration-150 hover:bg-brand-dark active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .shadow-soft {
+    @apply shadow-[0_12px_30px_-20px_rgba(15,118,110,0.6)];
+  }
+}
+
+.phone-input .PhoneInputInput {
+  @apply w-full bg-transparent text-base text-slate-900 placeholder:text-slate-400 focus:outline-none;
+}
+
+.phone-input .PhoneInputCountrySelect {
+  @apply text-slate-500;
+}

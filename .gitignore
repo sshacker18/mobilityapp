@@ -1,0 +1,6 @@
+
+backend/.env
+
+# Dev-only: ignore logs and temporary PID files
+logs/
+tmp/

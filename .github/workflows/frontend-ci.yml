@@ -1,0 +1,53 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend deps
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Install Playwright browsers
+        run: |
+          cd frontend
+          npx playwright install --with-deps || true
+
+      - name: Run frontend tests (if any)
+        run: |
+          cd frontend
+          npm test --if-present || true
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+
+      - name: Deploy to Vercel (example)
+        if: env.VERCEL_TOKEN
+        run: |
+          echo "Vercel deploy example. Set VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_ORG_ID as secrets."
+          # npx vercel --prod --token $VERCEL_TOKEN
+          # or use Vercel GitHub integration via UI
+
+      - name: Deployment note
+        run: |
+          echo "No automatic deploy performed. See README_DEPLOY.md for deployment options (Vercel, Railway)."

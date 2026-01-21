@@ -1,0 +1,9 @@
+{
+  "frontendUrl": "http://localhost:5173",
+  "backendUrl": "http://localhost:4000",
+  "pids": [
+    36353,
+    36361
+  ],
+  "startedAt": "2026-01-20T16:21:50.189Z"
+}
